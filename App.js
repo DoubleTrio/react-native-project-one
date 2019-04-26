@@ -1,10 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, View, Vibration } from 'react-native';
-import {vibrate} from './utils' // Unfortunately, I have a device that doesn't support vibration 
+import { StyleSheet, Text, View } from 'react-native';
+import { vibrate } from './utils' // Unfortunately, I have a device that doesn't support vibration, so I'm not too sure if vibration works 
 
-const pattern = [500, 500, 500]
-const workTime = 10
-const breakTime = 20
+const workTime = 1500
+const breakTime = 300
 
 export default class App extends React.Component {
   constructor() {
@@ -24,12 +23,6 @@ export default class App extends React.Component {
     clearInterval(this.intervel)
   }
 
-  decrease = () => {
-    this.setState(prevState => ({
-      timer: prevState.timer - 1,
-    }), () => this.swapTime(this.state.timer, this.state.onWork))
-  }
-
   convert = (seconds) => {
     const minutes = seconds / 60
     const secs = minutes % 1 === 0 ? '00' : seconds % 60
@@ -40,16 +33,20 @@ export default class App extends React.Component {
   }
 
   swapTime = (timer, onWork) => {
-    if (timer === -1) {
+    if (timer === 0) {
       vibrate()
-      this.setState({timer: onWork ? breakTime : breakTime})
+      this.setState(prevState => ({
+        timer: onWork ? breakTime : workTime,
+        onWork: !prevState.onWork
+      }))
     }
   }
 
-  pauseUnpause = (paused) => {
-    paused ? clearInterval(this.intervel) : this.intervel = setInterval(this.decrease, 1000)
+  decrease = () => {
+    this.setState(prevState => ({
+      timer: prevState.timer - 1,
+    }), () => this.swapTime(this.state.timer, this.state.onWork))
   }
-
 
   toggle = () => {
     this.setState(prevState => ({
@@ -57,21 +54,25 @@ export default class App extends React.Component {
     }), () => this.pauseUnpause(this.state.paused))
   }
 
+  pauseUnpause = (paused) => {
+    paused ? clearInterval(this.intervel) : this.intervel = setInterval(this.decrease, 1000)
+  }
 
   reset = () => {
-    this.setState({
-      timer: workTime,
+    this.setState(prevState => ({
+      timer: prevState.onWork ? workTime : breakTime,
       paused: true,
-    }, () => this.pauseUnpause(this.state.paused))
+      onWork: prevState.onWork
+    }), () => this.pauseUnpause(this.state.paused))
   }
 
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.header}>Worktime!</Text>
-        <Text style={styles.timer}>{this.state.timer} {this.convert(this.state.timer)}</Text>
+        <Text style={[styles.header, styles.font]}>{this.state.onWork ? 'Work Timer' : 'Break Timer'}</Text>
+        <Text style={[styles.timer, styles.font]}>{this.convert(this.state.timer)}</Text>
         <View style={styles.buttonContainer}>
-          <Text style={styles.button} onPress={this.toggle}>Start</Text>
+          <Text style={styles.button} onPress={this.toggle}>{this.state.paused ? 'Start' : 'Stop'}</Text>
           <Text style={styles.button} onPress={this.reset}>Reset</Text>
         </View>
       </View>
@@ -87,26 +88,32 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  timer: {
-    fontSize: 78,
-  },
-
   button: {
     margin: 10,
     padding: 10,
     width: 70,
-    backgroundColor: '#007bff',
-    color: 'white',
     borderColor: 'black',
     borderWidth: 0.8,
-    borderRadius: 4,
+    borderRadius: 7,
     textAlign: 'center'
   },
 
   buttonContainer: {
     flexDirection: 'row'
   },
+
   header: {
     fontSize: 78,
+    fontWeight: '600',
+    padding: 20,
+    
+  },
+  
+  font: {
+    fontFamily: "Courier New",
+  },
+
+  timer: {
+    fontSize: 70,
   }
 });
