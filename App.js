@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { vibrate } from './utils' // Unfortunately, I have a device that doesn't support vibration, so I'm not too sure if vibration works 
