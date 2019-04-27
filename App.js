@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { vibrate } from './utils' // Unfortunately, I have a device that doesn't support vibration, so I'm not too sure if vibration works 
 import SmallButton from './SmallButton'
 
-const workTime = 60
+const workTime = 1500
 const breakTime = 300
 
 export default class App extends React.Component {
