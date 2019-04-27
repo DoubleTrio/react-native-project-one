@@ -1,19 +1,17 @@
-
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { vibrate } from './utils' // Unfortunately, I have a device that doesn't support vibration, so I'm not too sure if vibration works 
+import SmallButton from './SmallButton'
 
-const workTime = 1500
+const workTime = 60
 const breakTime = 300
 
 export default class App extends React.Component {
-  constructor() {
-    super()
-    this.state = {
-      timer: workTime,
-      onWork: true,
-      paused: true,
-    }
+
+  state = {
+    timer: workTime,
+    onWork: true,
+    paused: true,
   }
   
   componentDidMount() {
@@ -25,10 +23,11 @@ export default class App extends React.Component {
   }
 
   convert = (seconds) => {
-    const minutes = seconds / 60
-    const secs = minutes % 1 === 0 ? '00' : seconds % 60
-    const secFormat = secs.toString().length === 1 ? '0' + secs : secs
-    const minFormat = Math.floor(minutes).toString().length === 1 ? '0' + Math.floor(minutes) : Math.floor(minutes)
+    let minutes = seconds / 60
+    const secs = minutes % 1 === 0 ? '0' : seconds % 60
+    const secFormat = secs < 10 ? '0' + secs : secs
+    minutes = Math.floor(minutes)
+    const minFormat = minutes < 10 ? '0' + minutes : minutes
     const format = minFormat + ':' + secFormat
     return format
   }
@@ -73,8 +72,8 @@ export default class App extends React.Component {
         <Text style={[styles.header, styles.font]}>{this.state.onWork ? 'Work Timer' : 'Break Timer'}</Text>
         <Text style={[styles.timer, styles.font]}>{this.convert(this.state.timer)}</Text>
         <View style={styles.buttonContainer}>
-          <Text style={styles.button} onPress={this.toggle}>{this.state.paused ? 'Start' : 'Stop'}</Text>
-          <Text style={styles.button} onPress={this.reset}>Reset</Text>
+          <SmallButton text = {this.state.paused ? 'Start' : 'Stop'} action={this.toggle} />
+          <SmallButton text = 'Reset' action={this.reset} />
         </View>
       </View>
     );
@@ -87,16 +86,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-
-  button: {
-    margin: 10,
-    padding: 10,
-    width: 70,
-    borderColor: 'black',
-    borderWidth: 0.8,
-    borderRadius: 7,
-    textAlign: 'center'
   },
 
   buttonContainer: {
